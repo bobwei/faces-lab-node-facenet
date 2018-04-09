@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nodemon src/index.js --exec babel-node",
     "start": "babel-node src/index.js",
+    "build": "babel src --out-dir lib --copy-files",
     "test": "jest --onlyChanged --watch",
     "test:all": "jest",
     "flow": "flow",
