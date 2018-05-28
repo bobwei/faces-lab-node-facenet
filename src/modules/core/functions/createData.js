@@ -8,10 +8,7 @@ import R from 'ramda';
 
 import getPhotos from 'modules/core/functions/getPhotos';
 
-const fn = ({
-  outputDir = path.resolve('tmp'),
-  photoOutputDir = path.join(outputDir, 'photos'),
-} = {}) => {
+const fn = ({ photoOutputDir } = {}) => {
   return Promise.resolve(require('modules/fixtures/data/timeline_media.json'))
     .then(getPhotos)
     .then(photos => {
