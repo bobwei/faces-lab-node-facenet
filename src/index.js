@@ -7,7 +7,7 @@ import async from 'async';
 
 import createData from 'modules/core/functions/createData';
 import logExecTime from 'modules/core/functions/logExecTime';
-import waitAll from 'modules/utils/functions/waitAll';
+import createFaces from 'modules/core/functions/createFaces';
 
 const fn = ({
   outputDir = path.resolve('tmp'),
@@ -29,30 +29,7 @@ const fn = ({
       .then(() => console.log('facenet init done.')),
   ])
     .then(R.nth(0))
-    .then(facePaths => {
-      console.log(`${facePaths.length} photos processing...`);
-      return new Promise((resolve, reject) => {
-        const results = [];
-        const concurrency = 1;
-        const queue = async.queue((facePath, callback) => {
-          console.log('processing', facePath);
-          return logExecTime(state.facenet.align.bind(state.facenet))(facePath)
-            .then(
-              R.map(face =>
-                face
-                  .save(path.join(faceOutputDir, `${face.md5}.jpg`))
-                  .then(() => face),
-              ),
-            )
-            .then(waitAll)
-            .then(data => results.push(...data))
-            .then(callback)
-            .catch(callback);
-        }, concurrency);
-        queue.push(facePaths);
-        queue.drain = error => (error ? reject(error) : resolve(results));
-      });
-    })
+    .then(createFaces({ ...state, faceOutputDir }))
     .then(faces => {
       console.log(`${faces.length} faces processing...`);
       return new Promise((resolve, reject) => {
