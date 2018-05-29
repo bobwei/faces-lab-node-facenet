@@ -3,11 +3,10 @@ import glob from 'glob';
 import mkdirp from 'mkdirp';
 import { Facenet } from 'facenet';
 import R from 'ramda';
-import async from 'async';
 
 import createData from 'modules/core/functions/createData';
-import logExecTime from 'modules/core/functions/logExecTime';
 import createFaces from 'modules/core/functions/createFaces';
+import createEmbeddings from 'modules/core/functions/createEmbeddings';
 
 const fn = ({
   outputDir = path.resolve('tmp'),
@@ -30,20 +29,7 @@ const fn = ({
   ])
     .then(R.nth(0))
     .then(createFaces({ ...state, faceOutputDir }))
-    .then(faces => {
-      console.log(`${faces.length} faces processing...`);
-      return new Promise((resolve, reject) => {
-        const concurrency = 1;
-        const queue = async.queue((face, callback) => {
-          console.log('processing', face.md5);
-          return logExecTime(state.facenet.embedding.bind(state.facenet))(face)
-            .then(callback)
-            .catch(callback);
-        }, concurrency);
-        queue.push(faces);
-        queue.drain = error => (error ? reject(error) : resolve());
-      });
-    })
+    .then(createEmbeddings({ ...state }))
     .then(() => state.facenet.quit())
     .catch(console.log);
 };
