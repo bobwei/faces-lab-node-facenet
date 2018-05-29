@@ -20,8 +20,8 @@ const fn = ({
   };
   return Promise.all([
     createData({ photoOutputDir })
-      .then(() => console.log('data created.'))
-      .then(() => glob.sync(`${photoOutputDir}/*.jpg`)),
+      .then(() => glob.sync(`${photoOutputDir}/*.jpg`))
+      .then(R.tap(data => console.log(`${data.length} photos created.`))),
     Promise.resolve()
       .then(() => console.log('init facenet...'))
       .then(() => state.facenet.init())
