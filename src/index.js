@@ -25,7 +25,7 @@ const fn = ({
     .then(R.nth(0))
     .then(
       R.pipe(
-        R.map(face => state.facenet.align(face)),
+        R.map(facePath => state.facenet.align(facePath)),
         waitAll,
       ),
     )
