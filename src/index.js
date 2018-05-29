@@ -8,7 +8,7 @@ import async from 'async';
 
 import createData from 'modules/core/functions/createData';
 import logExecTime from 'modules/core/functions/logExecTime';
-// import waitAll from 'modules/utils/functions/waitAll';
+import waitAll from 'modules/utils/functions/waitAll';
 // import getNFaces from 'modules/core/functions/getNFaces';
 
 const fn = ({
@@ -38,6 +38,14 @@ const fn = ({
         const queue = async.queue((facePath, callback) => {
           console.log('processing', facePath);
           return logExecTime(state.facenet.align.bind(state.facenet))(facePath)
+            .then(
+              R.map(face =>
+                face
+                  .save(path.join(faceOutputDir, `${face.md5}.jpg`))
+                  .then(() => face),
+              ),
+            )
+            .then(waitAll)
             .then(callback)
             .catch(callback);
         }, concurrency);
