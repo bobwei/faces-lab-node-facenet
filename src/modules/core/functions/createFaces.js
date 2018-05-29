@@ -11,7 +11,6 @@ const fn = ({ facenet, faceOutputDir }, facePaths) => {
     const results = [];
     const concurrency = 1;
     const queue = async.queue((facePath, callback) => {
-      console.log('processing', facePath);
       return logExecTime(facenet.align.bind(facenet))(facePath)
         .then(
           R.map(face =>

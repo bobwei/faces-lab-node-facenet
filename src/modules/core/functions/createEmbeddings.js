@@ -8,7 +8,6 @@ const fn = ({ facenet }, faces) => {
   return new Promise((resolve, reject) => {
     const concurrency = 1;
     const queue = async.queue((face, callback) => {
-      console.log('processing', face.md5);
       return logExecTime(facenet.embedding.bind(facenet))(face)
         .then(callback)
         .catch(callback);
