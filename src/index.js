@@ -10,8 +10,10 @@ import waitAll from 'modules/utils/functions/waitAll';
 const fn = ({
   outputDir = path.resolve('tmp'),
   photoOutputDir = path.join(outputDir, 'photos'),
+  faceOutputDir = path.join(outputDir, 'faces'),
 } = {}) => {
   mkdirp.sync(photoOutputDir);
+  mkdirp.sync(faceOutputDir);
   const state = {
     facenet: new Facenet(),
   };
@@ -27,7 +29,18 @@ const fn = ({
     .then(R.nth(0))
     .then(
       R.pipe(
-        R.map(facePath => state.facenet.align(facePath)),
+        R.map(facePath =>
+          state.facenet
+            .align(facePath)
+            .then(
+              R.map(face =>
+                face
+                  .save(path.join(faceOutputDir, `${face.md5}.jpg`))
+                  .then(() => face),
+              ),
+            )
+            .then(waitAll),
+        ),
         waitAll,
       ),
     )
