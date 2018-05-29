@@ -10,25 +10,27 @@ const fn = ({
   outputDir = path.resolve('tmp'),
   photoOutputDir = path.join(outputDir, 'photos'),
 } = {}) => {
-  const facenet = new Facenet();
+  const state = {
+    facenet: new Facenet(),
+  };
   return Promise.all([
     createData({ photoOutputDir })
       .then(() => console.log('data created.'))
       .then(() => glob.sync(`${photoOutputDir}/*.jpg`)),
     Promise.resolve()
       .then(() => console.log('init facenet...'))
-      .then(() => facenet.init())
+      .then(() => state.facenet.init())
       .then(() => console.log('facenet init done.')),
   ])
     .then(R.nth(0))
     .then(
       R.pipe(
-        R.map(face => facenet.align(face)),
+        R.map(face => state.facenet.align(face)),
         waitAll,
       ),
     )
     .then(R.tap(console.log))
-    .then(() => facenet.quit())
+    .then(() => state.facenet.quit())
     .catch(console.log);
 };
 
