@@ -34,6 +34,7 @@ const fn = ({
     .then(facePaths => {
       console.log(`${facePaths.length} photos processing...`);
       return new Promise((resolve, reject) => {
+        const results = [];
         const concurrency = 1;
         const queue = async.queue((facePath, callback) => {
           console.log('processing', facePath);
@@ -46,11 +47,12 @@ const fn = ({
               ),
             )
             .then(waitAll)
+            .then(data => results.push(...data))
             .then(callback)
             .catch(callback);
         }, concurrency);
         queue.push(facePaths);
-        queue.drain = error => (error ? reject(error) : resolve());
+        queue.drain = error => (error ? reject(error) : resolve(results));
       });
     })
     .then(() => state.facenet.quit())
