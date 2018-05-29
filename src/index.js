@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import path from 'path';
 import glob from 'glob';
 import mkdirp from 'mkdirp';
@@ -40,6 +41,22 @@ const fn = ({
               ),
             )
             .then(waitAll),
+        ),
+        waitAll,
+      ),
+    )
+    .then(
+      R.pipe(
+        R.map(
+          R.pipe(
+            R.map(face =>
+              state.facenet.embedding(face).then(embedding => {
+                face.embedding = embedding;
+                return face;
+              }),
+            ),
+            waitAll,
+          ),
         ),
         waitAll,
       ),
