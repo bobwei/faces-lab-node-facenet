@@ -7,6 +7,7 @@ import R from 'ramda';
 
 import createData from 'modules/core/functions/createData';
 import waitAll from 'modules/utils/functions/waitAll';
+import getNFaces from 'modules/core/functions/getNFaces';
 
 const fn = ({
   outputDir = path.resolve('tmp'),
@@ -43,6 +44,14 @@ const fn = ({
             .then(waitAll),
         ),
         waitAll,
+      ),
+    )
+    .then(
+      R.tap(
+        R.pipe(
+          getNFaces,
+          n => console.log(n, 'faces saved.'),
+        ),
       ),
     )
     .then(
