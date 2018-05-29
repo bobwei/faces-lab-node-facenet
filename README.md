@@ -8,3 +8,11 @@ This is a demo project used to test performance of [node-facenet](https://github
 | [Facenet.embedding()](https://www.zixia.net/node-facenet/#Facenet+embedding) | 143.18 ms | [embedding](src/modules/core/functions/createEmbeddings.js#L8) |
 
 ![](docs/execution_time.png)
+
+## Getting Started
+
+```
+npm install
+
+npm run dev
+```
