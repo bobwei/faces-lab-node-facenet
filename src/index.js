@@ -21,7 +21,7 @@ const fn = ({
   return Promise.all([
     createData({ photoOutputDir })
       .then(() => glob.sync(`${photoOutputDir}/*.jpg`))
-      .then(R.tap(data => console.log(`${data.length} photos created.`))),
+      .then(R.tap(data => console.log(`${data.length} photos downloaded.`))),
     Promise.resolve()
       .then(() => console.log('init facenet...'))
       .then(() => state.facenet.init())
@@ -29,7 +29,9 @@ const fn = ({
   ])
     .then(R.nth(0))
     .then(createFaces({ ...state, faceOutputDir }))
+    .then(R.tap(() => console.log()))
     .then(createEmbeddings({ ...state }))
+    .then(R.tap(() => console.log()))
     .then(() => state.facenet.quit())
     .catch(console.log);
 };

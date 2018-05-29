@@ -6,12 +6,13 @@ import logExecTime from 'modules/core/functions/logExecTime';
 import waitAll from 'modules/utils/functions/waitAll';
 
 const fn = ({ facenet, faceOutputDir }, facePaths) => {
-  console.log(`${facePaths.length} photos processing...`);
+  console.log(`${facePaths.length} photos aligning...`);
+  const align = logExecTime(facenet.align.bind(facenet));
   return new Promise((resolve, reject) => {
     const results = [];
     const concurrency = 1;
     const queue = async.queue((facePath, callback) => {
-      return logExecTime(facenet.align.bind(facenet))(facePath)
+      return align(facePath)
         .then(
           R.map(face =>
             face
