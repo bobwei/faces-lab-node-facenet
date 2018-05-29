@@ -1,5 +1,6 @@
 import path from 'path';
 import glob from 'glob';
+import mkdirp from 'mkdirp';
 import { Facenet } from 'facenet';
 import R from 'ramda';
 
@@ -10,6 +11,7 @@ const fn = ({
   outputDir = path.resolve('tmp'),
   photoOutputDir = path.join(outputDir, 'photos'),
 } = {}) => {
+  mkdirp.sync(photoOutputDir);
   const state = {
     facenet: new Facenet(),
   };

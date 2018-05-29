@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import path from 'path';
 import fs from 'fs';
-import mkdirp from 'mkdirp';
 import async from 'async';
 import axios from 'axios';
 import R from 'ramda';
@@ -20,7 +19,6 @@ const fn = ({ photoOutputDir } = {}) => {
             .get(display_url, { responseType: 'stream' })
             .then(R.path(['data']))
             .then(stream => {
-              mkdirp.sync(photoOutputDir);
               stream.pipe(
                 fs.createWriteStream(path.join(photoOutputDir, `${id}.jpg`)),
               );
