@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import path from 'path';
 import glob from 'glob';
 import mkdirp from 'mkdirp';
@@ -9,7 +8,6 @@ import async from 'async';
 import createData from 'modules/core/functions/createData';
 import logExecTime from 'modules/core/functions/logExecTime';
 import waitAll from 'modules/utils/functions/waitAll';
-// import getNFaces from 'modules/core/functions/getNFaces';
 
 const fn = ({
   outputDir = path.resolve('tmp'),
@@ -53,6 +51,20 @@ const fn = ({
         }, concurrency);
         queue.push(facePaths);
         queue.drain = error => (error ? reject(error) : resolve(results));
+      });
+    })
+    .then(faces => {
+      console.log(`${faces.length} faces processing...`);
+      return new Promise((resolve, reject) => {
+        const concurrency = 1;
+        const queue = async.queue((face, callback) => {
+          console.log('processing', face.md5);
+          return logExecTime(state.facenet.embedding.bind(state.facenet))(face)
+            .then(callback)
+            .catch(callback);
+        }, concurrency);
+        queue.push(faces);
+        queue.drain = error => (error ? reject(error) : resolve());
       });
     })
     .then(() => state.facenet.quit())
