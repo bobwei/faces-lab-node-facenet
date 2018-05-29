@@ -1,25 +1,8 @@
-# Js App Boilerplate
+# faces-lab
 
-This is a js app boilerplate with batteries included to speed up project initiation.
+This is a demo project used to test performance of [node-facenet](https://github.com/zixia/node-facenet)
 
+- Avg. time of [align](https://www.zixia.net/node-facenet/#Facenet+align): 939.09 ms
+- Avg. time of [embedding](https://www.zixia.net/node-facenet/#Facenet+embedding): 143.18 ms
 
-## Getting Started
-
-
-### Install
-
-```
-yarn
-```
-
-### Development
-
-```
-yarn dev
-```
-
-### Test
-
-```
-yarn test
-```
+![](docs/execution_time.png)
