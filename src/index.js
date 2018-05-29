@@ -4,10 +4,12 @@ import glob from 'glob';
 import mkdirp from 'mkdirp';
 import { Facenet } from 'facenet';
 import R from 'ramda';
+import async from 'async';
 
 import createData from 'modules/core/functions/createData';
-import waitAll from 'modules/utils/functions/waitAll';
-import getNFaces from 'modules/core/functions/getNFaces';
+import logExecTime from 'modules/core/functions/logExecTime';
+// import waitAll from 'modules/utils/functions/waitAll';
+// import getNFaces from 'modules/core/functions/getNFaces';
 
 const fn = ({
   outputDir = path.resolve('tmp'),
@@ -29,48 +31,20 @@ const fn = ({
       .then(() => console.log('facenet init done.')),
   ])
     .then(R.nth(0))
-    .then(
-      R.pipe(
-        R.map(facePath =>
-          state.facenet
-            .align(facePath)
-            .then(
-              R.map(face =>
-                face
-                  .save(path.join(faceOutputDir, `${face.md5}.jpg`))
-                  .then(() => face),
-              ),
-            )
-            .then(waitAll),
-        ),
-        waitAll,
-      ),
-    )
-    .then(
-      R.tap(
-        R.pipe(
-          getNFaces,
-          n => console.log(n, 'faces saved.'),
-        ),
-      ),
-    )
-    .then(
-      R.pipe(
-        R.map(
-          R.pipe(
-            R.map(face =>
-              state.facenet.embedding(face).then(embedding => {
-                face.embedding = embedding;
-                return face;
-              }),
-            ),
-            waitAll,
-          ),
-        ),
-        waitAll,
-      ),
-    )
-    .then(R.tap(console.log))
+    .then(facePaths => {
+      console.log(`${facePaths.length} photos processing...`);
+      return new Promise((resolve, reject) => {
+        const concurrency = 1;
+        const queue = async.queue((facePath, callback) => {
+          console.log('processing', facePath);
+          return logExecTime(state.facenet.align.bind(state.facenet))(facePath)
+            .then(callback)
+            .catch(callback);
+        }, concurrency);
+        queue.push(facePaths);
+        queue.drain = error => (error ? reject(error) : resolve());
+      });
+    })
     .then(() => state.facenet.quit())
     .catch(console.log);
 };
